@@ -261,9 +261,9 @@
     }
 
     function drawFlower(f, now) {
-      f.stemH = Math.min(f.targetStemH, f.stemH + 3.2);
+      f.stemH = Math.min(f.targetStemH, f.stemH + 2.5);
       const gf = f.stemH / f.targetStemH;
-      if (gf > 0.82) f.bloomP = Math.min(1, f.bloomP + 0.020);
+      if (gf > 0.82) f.bloomP = Math.min(1, f.bloomP + 0.010);
 
       const sw = Math.sin(now * 0.001 * f.swaySpeed * 400 + f.sway) * 3.0 * gf;
       const tipX = f.x + sw;
