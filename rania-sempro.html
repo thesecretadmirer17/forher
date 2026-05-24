@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>buat Rania</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Raleway:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #181A18;
+      font-family: 'Raleway', sans-serif;
+      font-weight: 300;
+    }
+
+    #starCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    #page1 {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+    }
+
+    .btn {
+      background: transparent;
+      border: 1.5px solid #FFD700;
+      color: #FFD700;
+      padding: clamp(12px, 2vw, 16px) clamp(32px, 6vw, 52px);
+      font-family: 'Raleway', sans-serif;
+      font-size: clamp(1.1rem, 3.5vw, 1.5rem);
+      font-weight: 400;
+      border-radius: 50px;
+      cursor: pointer;
+      letter-spacing: 0.03em;
+      transition: all 0.3s ease;
+      animation: btnGlow 2.8s ease-in-out infinite;
+    }
+
+    @keyframes btnGlow {
+
+      0%,
+      100% {
+        box-shadow: 0 0 14px rgba(255, 215, 0, 0.12);
+      }
+
+      50% {
+        box-shadow: 0 0 30px rgba(255, 215, 0, 0.35);
+      }
+    }
+
+    .btn:hover {
+      background: rgba(255, 215, 0, 0.07);
+      box-shadow: 0 0 40px rgba(255, 215, 0, 0.45);
+      transform: scale(1.05);
+    }
+
+    .btn:active {
+      transform: scale(0.97);
+    }
+
+    #page2 {
+      position: fixed;
+      inset: 0;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      z-index: 10;
+    }
+
+    #textBlock {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: clamp(16px, 4vh, 48px) 1.5rem clamp(10px, 1.5vh, 20px);
+      z-index: 20;
+      pointer-events: none;
+    }
+
+    .t1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.8rem, 6vw, 3.4rem);
+      font-weight: 700;
+      color: #ffe89a;
+      text-shadow: 0 0 28px rgba(255, 215, 0, 0.55);
+      opacity: 0;
+      animation: fadeUp 1.2s ease forwards 0.4s;
+      text-align: center;
+      line-height: 1.2;
+    }
+
+    .t2 {
+      font-family: 'Raleway', sans-serif;
+      font-size: clamp(1rem, 3.2vw, 1.7rem);
+      font-weight: 300;
+      color: rgba(255, 230, 130, 0.82);
+      text-shadow: 0 0 14px rgba(255, 215, 0, 0.3);
+      opacity: 0;
+      animation: fadeUp 1s ease forwards 1.2s;
+      margin-top: 0.4em;
+      text-align: center;
+      line-height: 1.3;
+    }
+
+    .t3 {
+      font-family: 'Raleway', sans-serif;
+      font-size: clamp(1rem, 3.2vw, 1.7rem);
+      font-weight: 300;
+      color: rgba(255, 225, 110, 0.70);
+      text-shadow: 0 0 10px rgba(255, 215, 0, 0.2);
+      opacity: 0;
+      animation: fadeUp 1s ease forwards 2.0s;
+      margin-top: 0.3em;
+      text-align: center;
+      line-height: 1.3;
+    }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    #scene {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      z-index: 15;
+    }
+
+    .petal {
+      position: fixed;
+      pointer-events: none;
+      z-index: 25;
+      border-radius: 50%;
+      opacity: 0;
+      animation: petalUp linear forwards;
+    }
+
+    @keyframes petalUp {
+      0% {
+        opacity: 0.75;
+        transform: translateY(0) rotate(0deg);
+      }
+
+      100% {
+        opacity: 0;
+        transform: translateY(-220px) rotate(70deg);
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <canvas id="starCanvas"></canvas>
+  <div id="page1">
+    <button class="btn" onclick="goPage2()">Cobaa pencet tombol inii</button>
+  </div>
+  <div id="page2">
+    <div id="textBlock">
+      <p class="t1">Semangatt Semproo Raniaa</p>
+      <p class="t2">Semoga Semuanya Berjalan dengan Baik dan Lancarr,</p>
+      <p class="t3">Semua Orang Selalu Bangga sama Kamuu, Bismillahh bismillahh Bisaa</p>
+    </div>
+    <canvas id="scene"></canvas>
+  </div>
+  <script>
+    // STARS
+    const starCv = document.getElementById('starCanvas');
+    const starCtx = starCv.getContext('2d');
+    let stars = [];
+    function resizeStar() { starCv.width = window.innerWidth; starCv.height = window.innerHeight; }
+    resizeStar();
+    function buildStars() {
+      stars = [];
+      for (let i = 0; i < 160; i++) {
+        stars.push({
+          x: Math.random() * starCv.width, y: Math.random() * starCv.height,
+          r: 0.4 + Math.random() * 1.4, phase: Math.random() * Math.PI * 2, speed: 0.004 + Math.random() * 0.012,
+          col: ['#ffffff', '#fff8d0', '#d0e8ff', '#ffe8a0'][Math.floor(Math.random() * 4)]
+        });
+      }
+    }
+    buildStars();
+    function animStars(now) {
+      starCtx.clearRect(0, 0, starCv.width, starCv.height);
+      stars.forEach(s => {
+        const a = 0.2 + 0.65 * Math.abs(Math.sin(now * 0.001 * s.speed * 80 + s.phase));
+        starCtx.globalAlpha = a; starCtx.fillStyle = s.col;
+        starCtx.beginPath(); starCtx.arc(s.x, s.y, s.r, 0, Math.PI * 2); starCtx.fill();
+      });
+      starCtx.globalAlpha = 1;
+    }
+
+    // SCENE
+    let sc, sctx, W, H, flower = null, t0 = null, lastPetal = 0, page2Active = false;
+
+    // 7 leaves: 3 left (dir=-1), 4 right (dir=1)
+    // hf = fraction along stem from bottom (0=base, 1=tip)
+    const LEAF_CFG = [
+      { hf: 0.15, dir: -1, sm: 1.05 },
+      { hf: 0.24, dir: 1, sm: 1.10 },
+      { hf: 0.36, dir: -1, sm: 1.00 },
+      { hf: 0.47, dir: 1, sm: 0.95 },
+      { hf: 0.58, dir: -1, sm: 0.88 },
+      { hf: 0.68, dir: 1, sm: 0.82 },
+      { hf: 0.77, dir: 1, sm: 0.74 },
+    ];
+
+    function initScene() {
+      sc = document.getElementById('scene');
+      W = window.innerWidth;
+      const tb = document.getElementById('textBlock');
+      H = window.innerHeight - tb.offsetHeight - 16;
+      sc.width = W; sc.height = H; sc.style.height = H + 'px';
+      sctx = sc.getContext('2d');
+      buildFlower();
+    }
+
+    function buildFlower() {
+      const isMobile = W < 520;
+      const size = isMobile ? Math.min(W * 0.26, 90) : Math.min(W * 0.16, 120);
+      flower = {
+        x: W / 2, stemH: 0,
+        targetStemH: H * 0.60,   // shorter stem
+        size: size,
+        bloomP: 0, sway: 0, swaySpeed: 0.0028,
+      };
+    }
+
+    function drawFlower(f, now) {
+      f.stemH = Math.min(f.targetStemH, f.stemH + 3.2);
+      const gf = f.stemH / f.targetStemH;
+      if (gf > 0.82) f.bloomP = Math.min(1, f.bloomP + 0.020);
+
+      const sw = Math.sin(now * 0.001 * f.swaySpeed * 400 + f.sway) * 3.0 * gf;
+      const tipX = f.x + sw;
+      const tipY = H - f.stemH;
+
+      sctx.save();
+
+      // glow
+      if (f.bloomP > 0.1) {
+        const glowR = f.size * 2.6 * f.bloomP;
+        const gr = sctx.createRadialGradient(tipX, tipY, 0, tipX, tipY, glowR);
+        gr.addColorStop(0, `rgba(255,215,0,${0.24 * f.bloomP})`);
+        gr.addColorStop(1, 'rgba(255,215,0,0)');
+        sctx.fillStyle = gr; sctx.beginPath(); sctx.arc(tipX, tipY, glowR, 0, Math.PI * 2); sctx.fill();
+      }
+
+      // stem
+      const stemW = Math.max(9, f.size * 0.13);
+      sctx.lineWidth = stemW; sctx.strokeStyle = '#4a9e3f'; sctx.lineCap = 'round';
+      sctx.beginPath(); sctx.moveTo(f.x, H);
+      sctx.quadraticCurveTo(f.x + sw * 0.4, (H + tipY) / 2, tipX, tipY);
+      sctx.stroke();
+
+      // leaves — placed precisely on the bezier curve, drawn on correct side
+      LEAF_CFG.forEach(lc => {
+        const leafAt = lc.hf - 0.06;
+        if (gf > leafAt) {
+          const lp = Math.min(1, (gf - leafAt) / 0.22);
+          const t = lc.hf;
+          // quadratic bezier point at t
+          const ctrlX = f.x + sw * 0.4, ctrlY = (H + tipY) / 2;
+          const bx = (1 - t) * (1 - t) * f.x + 2 * (1 - t) * t * ctrlX + t * t * tipX;
+          const by = (1 - t) * (1 - t) * H + 2 * (1 - t) * t * ctrlY + t * t * tipY;
+          // tangent at t for stem angle
+          const tx_tan = 2 * (1 - t) * (ctrlX - f.x) + 2 * t * (tipX - ctrlX);
+          const ty_tan = 2 * (1 - t) * (ctrlY - H) + 2 * t * (tipY - ctrlY);
+          const stemAngle = Math.atan2(ty_tan, tx_tan); // angle of stem at this point
+          drawLeaf(bx, by, f.size * lc.sm, lc.dir, lp, stemAngle, stemW);
+        }
+      });
+
+      // outer petals — bigger
+      if (f.bloomP > 0) {
+        const nP = 16;
+        const pL = f.size * f.bloomP * 1.15; // 15% bigger
+        for (let i = 0; i < nP; i++) {
+          const angle = (Math.PI * 2 / nP) * i;
+          const px = tipX + Math.cos(angle) * pL * 0.78;
+          const py = tipY + Math.sin(angle) * pL * 0.78;
+          sctx.save();
+          sctx.translate(px, py); sctx.rotate(angle + Math.PI / 2);
+          sctx.beginPath(); sctx.ellipse(0, 0, pL * 0.34, pL * 0.56, 0, 0, Math.PI * 2);
+          const pg = sctx.createRadialGradient(0, -pL * 0.15, 0, 0, 0, pL * 0.58);
+          pg.addColorStop(0, '#fffaaa'); pg.addColorStop(0.45, '#FFD700'); pg.addColorStop(1, '#b87800');
+          sctx.fillStyle = pg; sctx.fill();
+          sctx.strokeStyle = 'rgba(160,100,0,0.15)'; sctx.lineWidth = 0.8; sctx.stroke();
+          sctx.restore();
+        }
+        // inner petals
+        const pL2 = f.size * f.bloomP * 0.72;
+        for (let i = 0; i < 16; i++) {
+          const angle = (Math.PI * 2 / 16) * i + (Math.PI / 16);
+          const px = tipX + Math.cos(angle) * pL2 * 0.74;
+          const py = tipY + Math.sin(angle) * pL2 * 0.74;
+          sctx.save();
+          sctx.translate(px, py); sctx.rotate(angle + Math.PI / 2);
+          sctx.beginPath(); sctx.ellipse(0, 0, pL2 * 0.28, pL2 * 0.46, 0, 0, Math.PI * 2);
+          sctx.fillStyle = 'rgba(220,160,0,0.55)'; sctx.fill();
+          sctx.restore();
+        }
+        // center disk
+        const cR = f.size * 0.34 * f.bloomP;
+        const cg = sctx.createRadialGradient(tipX, tipY, 0, tipX, tipY, cR);
+        cg.addColorStop(0, '#7a4a10'); cg.addColorStop(0.55, '#4a2505'); cg.addColorStop(1, '#2e1503');
+        sctx.beginPath(); sctx.arc(tipX, tipY, cR, 0, Math.PI * 2); sctx.fillStyle = cg; sctx.fill();
+        if (f.bloomP > 0.55) {
+          for (let d = 0; d < 18; d++) {
+            const da = (Math.PI * 2 / 18) * d; const dr = cR * 0.62;
+            sctx.beginPath(); sctx.arc(tipX + Math.cos(da) * dr, tipY + Math.sin(da) * dr, 1.3, 0, Math.PI * 2);
+            sctx.fillStyle = 'rgba(255,210,70,0.45)'; sctx.fill();
+          }
+          sctx.beginPath(); sctx.arc(tipX - cR * 0.2, tipY - cR * 0.2, cR * 0.22, 0, Math.PI * 2);
+          sctx.fillStyle = 'rgba(255,200,80,0.18)'; sctx.fill();
+        }
+      }
+      sctx.restore();
+    }
+
+    function drawLeaf(bx, by, size, dir, prog, stemAngle, stemW) {
+      const fullW = size * 1.2;
+      const fullH = size * 0.60;
+      sctx.save();
+      sctx.translate(bx, by);
+      // rotate so leaf grows perpendicular to stem, then tilt outward by dir
+      // stemAngle is ~-PI/2 (going up). Perpendicular = stemAngle + dir*PI/2
+      // We want leaf to spread outward, so rotate from stem normal
+      const leafAngle = stemAngle + dir * (Math.PI / 2 - 0.55);
+      sctx.rotate(leafAngle);
+      // offset from stem edge
+      sctx.translate(stemW * 0.5, 0);
+      sctx.beginPath();
+      sctx.moveTo(0, 0);
+      sctx.bezierCurveTo(fullW * 0.35 * prog, -fullH * 0.80 * prog, fullW * 0.80 * prog, -fullH * 0.45 * prog, fullW * prog, 0);
+      sctx.bezierCurveTo(fullW * 0.80 * prog, fullH * 0.45 * prog, fullW * 0.35 * prog, fullH * 0.55 * prog, 0, 0);
+      const lg = sctx.createLinearGradient(0, -fullH * 0.5, fullW * prog, fullH * 0.4);
+      lg.addColorStop(0, '#6cc96c'); lg.addColorStop(0.5, '#4aaa4a'); lg.addColorStop(1, '#286028');
+      sctx.fillStyle = lg; sctx.fill();
+      // midrib
+      sctx.strokeStyle = 'rgba(60,140,60,0.38)'; sctx.lineWidth = 1.0;
+      sctx.beginPath(); sctx.moveTo(0, 0); sctx.lineTo(fullW * prog * 0.88, 0); sctx.stroke();
+      // side veins
+      sctx.lineWidth = 0.6; sctx.strokeStyle = 'rgba(60,140,60,0.22)';
+      for (let v = 1; v <= 3; v++) {
+        const vx = fullW * prog * (v * 0.22);
+        sctx.beginPath(); sctx.moveTo(vx, 0); sctx.lineTo(vx + fullW * 0.09, -(fullH * 0.38 * prog)); sctx.stroke();
+        sctx.beginPath(); sctx.moveTo(vx, 0); sctx.lineTo(vx + fullW * 0.09, (fullH * 0.38 * prog)); sctx.stroke();
+      }
+      sctx.restore();
+    }
+
+    function spawnPetal() {
+      const p = document.createElement('div'); p.className = 'petal';
+      const sz = 5 + Math.random() * 9; p.style.width = sz + 'px'; p.style.height = sz + 'px';
+      const cols = ['#FFD700', '#FFC107', '#ffe566', '#d4a000'];
+      p.style.background = cols[Math.floor(Math.random() * cols.length)];
+      p.style.left = (5 + Math.random() * 88) + 'vw'; p.style.bottom = (5 + Math.random() * 55) + 'vh';
+      const dur = 2.8 + Math.random() * 3; p.style.animationDuration = dur + 's';
+      document.body.appendChild(p); setTimeout(() => p.remove(), dur * 1000 + 100);
+    }
+
+    function loop(now) {
+      if (!page2Active) return;
+      if (!t0) t0 = now;
+      animStars(now); sctx.clearRect(0, 0, W, H);
+      if (flower) drawFlower(flower, now);
+      if (now - lastPetal > 1100) { spawnPetal(); lastPetal = now; }
+      requestAnimationFrame(loop);
+    }
+
+    function goPage2() {
+      document.getElementById('page1').style.display = 'none';
+      document.getElementById('page2').style.display = 'flex';
+      page2Active = true;
+      setTimeout(() => { initScene(); requestAnimationFrame(loop); }, 80);
+    }
+
+    function loopPage1(now) { animStars(now); if (!page2Active) requestAnimationFrame(loopPage1); }
+    requestAnimationFrame(loopPage1);
+
+    window.addEventListener('resize', () => {
+      resizeStar(); buildStars();
+      if (page2Active) {
+        const tb = document.getElementById('textBlock');
+        W = window.innerWidth; H = window.innerHeight - tb.offsetHeight - 16;
+        sc.width = W; sc.height = H; sc.style.height = H + 'px';
+        sctx = sc.getContext('2d'); buildFlower();
+      }
+    });
+  </script>
+</body>
+
+</html>
